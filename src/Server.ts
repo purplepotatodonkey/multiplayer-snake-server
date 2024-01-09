@@ -1,5 +1,5 @@
 import { BoardImpl } from './Board'
-import { Player } from './types/Player'
+import { Direction, Player } from './types/Player'
 
 /**
  * Server ingests in moves from multiple clients and calculates a final json of moves every half second in order to:
@@ -12,8 +12,8 @@ import { Player } from './types/Player'
 class Server {
 
     private board: BoardImpl = new BoardImpl();
-    private clients: Array<Player> = [];
-    private receivedMoves = [];
+    private clients: Array<number> = [];
+    private receivedMoves: Array<{player: Player, direction: Direction}> = [];
     private updatedMove;
 
     constructor() {
@@ -21,20 +21,19 @@ class Server {
     }
 
     /**
-     * adds a player to the board, adds a new client
+     * adds a playerId to the board, adds a new client using clientId
      */
-    addClient(client: Player) {
+    addClient(clientId: number) : void {
         this.board.addPlayer();
-        this.clients.push(client);
-        // ...
+        this.clients.push(clientId);
     }
 
     /**
      * adds move to receivedMoves, receives the move from a client
      * once a client sends in a move, we reject all other moves after the first
      */
-    receiveMove() {
-        
+    receiveMove(move: {player: Player, direction: Direction}) : void {
+        this.receivedMoves.push(move);
     }
 
     /**
@@ -42,16 +41,23 @@ class Server {
      * calculate updated state
      * send in updated state to all remaining clients and to the Board object
      */
-    updateMoves() {
-
+    updateMoves() : void {
+        // come up with updated move - need to discuss with Joseph
+        // ...
+        // wipe out received moves
+        this.receivedMoves = [];
     }
 
     /**
      * update a client that they have lost the game, while the game is still continuing(no one has won yet)
      * remove client from record, remove traces of client from Board
      */
-    updateClientLostGame() {
-
+    updateClientLostGame(clientId : number) {
+        // ... discuss with Joseph
+        // remove client from client list
+        this.clients.filter(clientIterId => clientIterId !== clientId);
+        // remove traces of client from board
+        this.board.removePlayer(clientId);
     }
 
     /**
@@ -59,7 +65,7 @@ class Server {
      * update all clients with winner of the game
      */
     updateClientWonGame() {
-
+        // wipe the board
     }
 
     

@@ -50,7 +50,7 @@ export class BoardImpl implements Board {
      * this is done when a player loses the game(we can implement quits in the future)
      * this changes map
      */
-    quitPlayer(): void {
+    removePlayer(clientId): void {
 
     }
 

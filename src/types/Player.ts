@@ -13,6 +13,6 @@ export interface Player {
     length: number;
     body: number[][];
     alive: boolean;
-    direction: number;
+    currentDirection: Direction;
     score: number;
 }
