@@ -1,0 +1,22 @@
+{
+  "name": "multiplayer-snake-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/purplepotatodonkey/multiplayer-snake-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/purplepotatodonkey/multiplayer-snake-server/issues"
+  },
+  "homepage": "https://github.com/purplepotatodonkey/multiplayer-snake-server#readme",
+  "dependencies": {
+    "socket.io": "^4.7.3"
+  }
+}

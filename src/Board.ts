@@ -1,18 +1,27 @@
+import { Direction, Player } from "./types/BoardTypes";
+
 /**
  * Board is a class that the server will implement to organize the following material to a game board object:
  * n x n grid of values
  * locations of food on the grid
  * locations of each player on the board
- * */ 
+ * */
+class Board implements Board {
+    id: string;
+    players: Player[];
+    moves: { [playerId: number]: Direction };
+    board: Board;
+    started: boolean;
+    ended: boolean;
+    winner: Player;
 
-class Board {
-    constructor(gridSize, maxPlayer) {
-        this.length = gridSize;
-        this.width = gridSize;
-        this.map = this.createGrid(gridSize);
-        this.players = [];
-        this.food = [];
-        this.checkRep();
+    constructor() {
+        // this.length = gridSize;
+        // this.width = gridSize;
+        // this.map = this.createGrid(gridSize);
+        // this.players = [];
+        // this.food = [];
+        // this.checkRep();
     }
 
     /**
