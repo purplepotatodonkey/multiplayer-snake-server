@@ -11,12 +11,18 @@ export class BoardImpl implements Board {
     public id: string;
     public rows: number;
     cols: number;
-    map: string[][];
+    map: Array<Array<String>>;
+    unoccupied: Array<[number, number]>;
 
 
     constructor(gridSize: number = 10) {
         this.rows, this.cols = gridSize;
-        // this.map = this.createGrid(gridSize);
+        this.createGrid();
+        for (let i = 0; i < this.rows; i++){
+            for (let j = 0; j < this.cols; j++){
+                this.unoccupied.push([i, j]);
+            }
+        }
         // this.players = [];
         // this.food = [];
         // this.checkRep();
@@ -47,10 +53,22 @@ export class BoardImpl implements Board {
      * adds a player to the board, with an initial length of some small number, to a location that optimizes game play of all snakes
      * this changes map
      */
-    addPlayer(): void {
+    addPlayer(clientId: string): void {
         // randomly drop the snake to any 2x1 unoccupied location
-        
-
+        // remove this index from unoccupied
+        const max: number = this.unoccupied.length;
+        const randomLocationIndex: number = Math.floor(Math.random() * max);
+        const renewedUnoccupied: Array<[number, number]>  = [];
+        for (let i = 0; i < this.unoccupied.length; i++){
+            if (i !== randomLocationIndex){
+                renewedUnoccupied.push(this.unoccupied[i]);
+            }
+            else {
+                const [xind, yind] : [number, number] = this.unoccupied[i];
+                this.map[yind][xind] = clientId;
+            }
+        }
+        this.unoccupied = renewedUnoccupied;
     }
 
     /**
@@ -76,10 +94,11 @@ export class BoardImpl implements Board {
      * once a food item has been consumed,remove the food item from the board and place a food item to a relocated place without any snakes
      * this changes map
      */
-    replaceFood(): void {
+    replaceFood(location: [number, number]): void {
         // calculate locations that are unoccupied
         // randomize to one of these locations
         // drop the food
+
 
     }
 
@@ -89,6 +108,7 @@ export class BoardImpl implements Board {
      */
     wonGame(): boolean {
         // confirm with joseph how someone wins the game
+        return true;
     }
 
     /**
@@ -97,6 +117,7 @@ export class BoardImpl implements Board {
      */
     updatePlayerLocation(moves: Array<{player: Player, direction: Direction}>): void {
         // talk to joseph about this
+        // remove any indices from unoccupied
     }
 
 

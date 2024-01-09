@@ -49,18 +49,18 @@ export interface Board {
   id: string;
   rows: number;
   cols: number;
-  map: string[][];
+  map: Array<Array<String>>;
 
   /**
    * @returns 
    */
   createGrid() : void;
 
-  addPlayer() : void;
+  addPlayer(clientId: string) : void;
 
-  quitPlayer() : void;
+  removePlayer(clientId: string) : void;
 
-  replaceFood() : void;
+  replaceFood(location: [number, number]) : void;
 
   /**
    * @returns
