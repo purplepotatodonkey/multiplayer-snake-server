@@ -1,4 +1,4 @@
-import { Board } from "./BoardTypes";
+import { Board } from "./Game";
 
 // Documentation: https://socket.io/docs/v4/typescript/
 

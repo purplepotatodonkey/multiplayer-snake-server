@@ -1,4 +1,5 @@
-Board
+import { BoardImpl } from './Board'
+import { Player } from './types/Player'
 
 /**
  * Server ingests in moves from multiple clients and calculates a final json of moves every half second in order to:
@@ -9,19 +10,22 @@ Board
  */ 
 
 class Server {
+
+    private board: BoardImpl = new BoardImpl();
+    private clients: Array<Player> = [];
+    private receivedMoves = [];
+    private updatedMove;
+
     constructor() {
-        this.board = board;
-        this.clients = [];
-        this.receivedMoves = [];
-        this.updatedMove;
+        // ... pass
     }
 
     /**
      * adds a player to the board, adds a new client
      */
-    addClient(client) {
+    addClient(client: Player) {
         this.board.addPlayer();
-        this.clients.append(client);
+        this.clients.push(client);
         // ...
     }
 
