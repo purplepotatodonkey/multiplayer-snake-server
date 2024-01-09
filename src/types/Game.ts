@@ -49,12 +49,12 @@ export interface Board {
   id: string;
   rows: number;
   cols: number;
-  map: number[][];
+  map: string[][];
 
   /**
    * @returns 
    */
-  createGrid() : Array<String>;
+  createGrid() : void;
 
   addPlayer() : void;
 

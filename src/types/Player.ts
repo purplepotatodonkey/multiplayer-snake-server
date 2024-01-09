@@ -8,7 +8,7 @@ export enum Direction {
 
 
 export interface Player {
-    id: number;
+    id: string;
     name: string;
     length: number;
     body: number[][];

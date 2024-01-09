@@ -12,7 +12,7 @@ import { Direction, Player } from './types/Player'
 class Server {
 
     private board: BoardImpl = new BoardImpl();
-    private clients: Array<number> = [];
+    private clients: Array<string> = [];
     private receivedMoves: Array<{player: Player, direction: Direction}> = [];
     private updatedMove;
 
@@ -23,7 +23,7 @@ class Server {
     /**
      * adds a playerId to the board, adds a new client using clientId
      */
-    addClient(clientId: number) : void {
+    addClient(clientId: string) : void {
         this.board.addPlayer();
         this.clients.push(clientId);
     }
@@ -52,7 +52,7 @@ class Server {
      * update a client that they have lost the game, while the game is still continuing(no one has won yet)
      * remove client from record, remove traces of client from Board
      */
-    updateClientLostGame(clientId : number) {
+    updateClientLostGame(clientId : string) {
         // ... discuss with Joseph
         // remove client from client list
         this.clients.filter(clientIterId => clientIterId !== clientId);

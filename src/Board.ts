@@ -8,14 +8,14 @@ import { Direction, Player } from "./types/Player";
  * locations of each player on the board
  * */
 export class BoardImpl implements Board {
-    id: string;
-    rows: number;
+    public id: string;
+    public rows: number;
     cols: number;
-    map: number[][];
+    map: string[][];
 
-    constructor() {
-        // this.length = gridSize;
-        // this.width = gridSize;
+
+    constructor(gridSize: number = 10) {
+        this.rows, this.cols = gridSize;
         // this.map = this.createGrid(gridSize);
         // this.players = [];
         // this.food = [];
@@ -28,13 +28,19 @@ export class BoardImpl implements Board {
     checkRep(){
         // ensure that gridSize is big enough for maxPlayer
         // ensure that len(this.players) 
+        // ensure that unoccupied locations is correct
     }
 
     /**
      * defines mapping of the Board to the n by n grid
      */
-    createGrid(): Array<String> {
-
+    createGrid(): void {
+        for (let i = 0; i < this.rows; i++){
+            this.map.push([])
+            for (let j = 0; j < this.cols; j++){
+                this.map[i].push('');
+            }
+        }
     }
 
     /**
@@ -42,6 +48,8 @@ export class BoardImpl implements Board {
      * this changes map
      */
     addPlayer(): void {
+        // randomly drop the snake to any 2x1 unoccupied location
+        
 
     }
 
@@ -50,7 +58,17 @@ export class BoardImpl implements Board {
      * this is done when a player loses the game(we can implement quits in the future)
      * this changes map
      */
-    removePlayer(clientId): void {
+    removePlayer(clientId : string): void {
+        for (let row of this.map) {
+            row.map((colIter) => {
+                if (colIter === clientId) {
+                    return;
+                }
+                else {
+                    return colIter;
+                }
+            })
+        }
 
     }
 
@@ -59,6 +77,9 @@ export class BoardImpl implements Board {
      * this changes map
      */
     replaceFood(): void {
+        // calculate locations that are unoccupied
+        // randomize to one of these locations
+        // drop the food
 
     }
 
@@ -67,15 +88,15 @@ export class BoardImpl implements Board {
      * suggestion: either the whole board is full, the amount of remaining spaces is less than the score difference,...
      */
     wonGame(): boolean {
-
+        // confirm with joseph how someone wins the game
     }
 
     /**
      * updates board rep upon a move of a player
      * @param : move is a json containing moves of all existing players on board(we count no move as an empty move)
      */
-    updatePlayerLocation(move): void {
-
+    updatePlayerLocation(moves: Array<{player: Player, direction: Direction}>): void {
+        // talk to joseph about this
     }
 
 
