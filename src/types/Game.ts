@@ -60,7 +60,7 @@ export interface Board {
 
   removePlayer(clientId: string) : void;
 
-  replaceFood(location: [number, number]) : void;
+  replaceFood(clientId: string, location: [number, number]) : void;
 
   /**
    * @returns

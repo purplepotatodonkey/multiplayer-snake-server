@@ -50,7 +50,7 @@ export class BoardImpl implements Board {
     }
 
     /**
-     * adds a player to the board, with an initial length of some small number, to a location that optimizes game play of all snakes
+     * adds a player to the board, with an initial length 1, to a location that optimizes game play of all snakes
      * this changes map
      */
     addPlayer(clientId: string): void {
@@ -78,14 +78,14 @@ export class BoardImpl implements Board {
      */
     removePlayer(clientId : string): void {
         for (let row of this.map) {
-            row.map((colIter) => {
+            row = row.map((colIter) => {
                 if (colIter === clientId) {
-                    return;
+                    return '';
                 }
                 else {
                     return colIter;
                 }
-            })
+            });
         }
 
     }
@@ -94,12 +94,28 @@ export class BoardImpl implements Board {
      * once a food item has been consumed,remove the food item from the board and place a food item to a relocated place without any snakes
      * this changes map
      */
-    replaceFood(location: [number, number]): void {
+    replaceFood(clientId: string, location: [number, number]): void {
+        // get rid of food in location
+        const xind: number = location[0];
+        const yind: number = location[1];
+        this.map[yind][xind] = clientId;
+
         // calculate locations that are unoccupied
         // randomize to one of these locations
-        // drop the food
-
-
+        // drop the food (represented by "X")
+        const max: number = this.unoccupied.length;
+        const randomLocationIndex: number = Math.floor(Math.random() * max);
+        const renewedUnoccupied: Array<[number, number]> = [];
+        for (let i = 0; i < this.unoccupied.length; i++) {
+            if (i === randomLocationIndex) {
+                renewedUnoccupied.push(this.unoccupied[i]);
+            }
+            else {
+                const [xind, yind]: [number, number] = this.unoccupied[i];
+                this.map[yind][xind] = 'X';
+            }
+        }
+        this.unoccupied = renewedUnoccupied;
     }
 
     /**
