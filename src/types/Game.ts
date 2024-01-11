@@ -73,3 +73,8 @@ export interface Board {
   updatePlayerLocation(move) : void;
 
 }
+
+export interface Move {
+  playerId: number;
+  direction: Direction;
+}

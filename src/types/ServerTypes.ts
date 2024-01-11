@@ -1,4 +1,4 @@
-import { Board } from "./Game";
+import { Board, Move } from "./Game";
 
 // Documentation: https://socket.io/docs/v4/typescript/
 
@@ -8,7 +8,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  sendMove: () => void;
+  sendMove: (move: Move) => void;
 }
 
 export interface InterServerEvents {
