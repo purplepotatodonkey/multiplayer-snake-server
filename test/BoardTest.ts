@@ -1,8 +1,20 @@
 import * as assert from 'assert';
 import { BoardImpl } from "../src/Board"
 
-describe("BoardImpl Tests", () => {
-    it('should return 3 for add(1, 2)', () => {
-        assert.strictEqual(add(1, 2), 3);
+describe("BoardImpl Basic Tests", () => {
+    it('creating the empty board', () => {
+        //
+    });
+
+    it('adding players', () => {
+        //
+    });
+
+    it('make one snake move forward', () => {
+        //
+    });
+
+    it('make one snake collide with another snake', () => {
+        //
     });
 });

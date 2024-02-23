@@ -9,16 +9,19 @@ import assert from 'assert';
  * locations of each player on the board
  * */
 export class BoardImpl implements Board {
-    public id: string;
-    public rows: number;
+    id: string;
+    rows: number;
     cols: number;
-    map: Array<Array<string>>;
-    unoccupied: Array<[number, number]>;
+    map: Array<Array<string>> = [];
+    unoccupied: Array<[number, number]> = [];
     uniqueClients: Array<string>;
+    playerLocs: Map<string, Array<[number, number]>> = new Map();
 
 
-    constructor(gridSize: number = 50) {
-        this.rows, this.cols = gridSize;
+    constructor(gridSize: number = 50, id: string) {
+        this.id = id;
+        this.rows = gridSize;
+        this.cols = gridSize;
         this.createGrid();
         for (let i = 0; i < this.rows; i++){
             for (let j = 0; j < this.cols; j++){
@@ -50,6 +53,7 @@ export class BoardImpl implements Board {
             }
         }
     }
+
 
     /**
      * adds a player to the board, with an initial length 1, to a location that optimizes game play of all snakes
@@ -91,7 +95,10 @@ export class BoardImpl implements Board {
             });
         }
         this.uniqueClients.filter((clientIdIter) => (clientIdIter !== clientId));
+    }
 
+    getPlayerTail(clientId: string): [number, number] {
+        return this.playerLocs[clientId][1];
     }
 
     /**
@@ -121,6 +128,7 @@ export class BoardImpl implements Board {
         }
         this.unoccupied = renewedUnoccupied;
     }
+
 
     /**
      * determines if the game has been won
@@ -216,7 +224,7 @@ export class BoardImpl implements Board {
                     // check who the player is bumping into
                     // check if that location is any player's tail and that the player didn't eat food
                     const bumpedPlayerId: string = this.map[move.next[0]][move.next[1]];
-                    if (this.getPlayer(bumpedPlayerId).getTail() == move.next && !mappingPlayerToMoves[bumpedPlayerId].eatsFood) {
+                    if (this.getPlayertTail(bumpedPlayerId) == move.next && !mappingPlayerToMoves[bumpedPlayerId].eatsFood) {
                         const yind: number = move.next[1];
                         const xind: number = move.next[0];
 
