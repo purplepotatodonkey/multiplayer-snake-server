@@ -18,5 +18,9 @@
   "homepage": "https://github.com/purplepotatodonkey/multiplayer-snake-server#readme",
   "dependencies": {
     "socket.io": "^4.7.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.11.0"
   }
 }

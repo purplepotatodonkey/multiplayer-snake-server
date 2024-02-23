@@ -6,6 +6,11 @@ export enum Status {
   ENDED
 }
 
+export interface Move {
+  playerId: number;
+  direction: Direction;
+}
+
 export interface Game {
   id: string;
   players: Player[];
@@ -49,11 +54,9 @@ export interface Board {
   id: string;
   rows: number;
   cols: number;
-  map: Array<Array<String>>;
+  map: Array<Array<string>>;
+  uniqueClients: Array<string>;
 
-  /**
-   * @returns 
-   */
   createGrid() : void;
 
   addPlayer(clientId: string) : void;
@@ -62,19 +65,10 @@ export interface Board {
 
   replaceFood(clientId: string, location: [number, number]) : void;
 
-  /**
-   * @returns
-   */
   wonGame() : boolean;
 
-  /**
-   * @param : move
-   */
-  updatePlayerLocation(move) : void;
+  playerNextLocation(player: Player, direction: Direction): { playerId: string, next: [number, number], message: string | null, eatsFood: boolean };
 
-}
+  consolidatedMoves(moves: Array<{ playerId: string, next: [number, number], message: string | null, eatsFood: boolean }>): void
 
-export interface Move {
-  playerId: number;
-  direction: Direction;
 }

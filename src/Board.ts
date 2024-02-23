@@ -1,5 +1,6 @@
-import { Status, Game, Board } from "./types/Game";
+import { Status, Game, Board, Move } from "./types/Game";
 import { Direction, Player } from "./types/Player";
+import assert from 'assert';
 
 /**
  * Board is a class that the server will implement to organize the following material to a game board object:
@@ -11,11 +12,12 @@ export class BoardImpl implements Board {
     public id: string;
     public rows: number;
     cols: number;
-    map: Array<Array<String>>;
+    map: Array<Array<string>>;
     unoccupied: Array<[number, number]>;
+    uniqueClients: Array<string>;
 
 
-    constructor(gridSize: number = 10) {
+    constructor(gridSize: number = 50) {
         this.rows, this.cols = gridSize;
         this.createGrid();
         for (let i = 0; i < this.rows; i++){
@@ -23,6 +25,8 @@ export class BoardImpl implements Board {
                 this.unoccupied.push([i, j]);
             }
         }
+        this.uniqueClients = [];
+        
         // this.players = [];
         // this.food = [];
         // this.checkRep();
@@ -32,9 +36,7 @@ export class BoardImpl implements Board {
      * ensures that board state is valid
      */
     checkRep(){
-        // ensure that gridSize is big enough for maxPlayer
-        // ensure that len(this.players) 
-        // ensure that unoccupied locations is correct
+        // nothing for now
     }
 
     /**
@@ -69,6 +71,7 @@ export class BoardImpl implements Board {
             }
         }
         this.unoccupied = renewedUnoccupied;
+        this.uniqueClients.push(clientId);
     }
 
     /**
@@ -87,6 +90,7 @@ export class BoardImpl implements Board {
                 }
             });
         }
+        this.uniqueClients.filter((clientIdIter) => (clientIdIter !== clientId));
 
     }
 
@@ -128,12 +132,142 @@ export class BoardImpl implements Board {
     }
 
     /**
+     * calculates next square for a player
+     * returns a JSON message if there will be an error
+     * player can either move forward or it loses the game because it crashed into another snake, itself, or the wall
+     * 
+     * @returns [xind, yind] of next player location if deemed valid. otherwise json string with error message
+     * 
+     */
+    playerNextLocation(player: Player, direction: Direction) : {playerId: string, next: [number, number], message: string | null, eatsFood: boolean} {
+        // first check that player is on the board
+        assert(player.getClientId() in this.uniqueClients);
+
+        const playerHeadLocation = player.getHeadLocation();
+        const yind: number = playerHeadLocation[1];
+        const xind: number = playerHeadLocation[0];
+        assert(yind >= 0 && xind >= 0 && yind < this.cols && xind < this.rows);
+
+        let eatsFood = false;
+
+        let newLocation: [number, number];
+
+        // check what the next space is on the board;
+        switch (direction) {
+            case Direction.UP:
+                newLocation = [yind + 1, xind];
+            case Direction.DOWN:
+                newLocation = [yind - 1, xind];
+            case Direction.LEFT:
+                newLocation = [yind, xind - 1];
+            case Direction.RIGHT:
+                newLocation = [yind, xind + 1];;
+        }
+
+        // check to see if we ran into a wall
+        try {
+            this.map[newLocation[1]][newLocation[0]];
+        }
+        catch {
+            // ran into wall
+            return {playerId: player.getClientId(), next: newLocation, message: JSON.stringify({'error': 'ran into wall', 'direction': direction }), eatsFood: eatsFood};
+        }
+        // we didn't run into wall
+        // check that next object is empty
+        if (this.map[newLocation[1]][newLocation[0]] === '' || this.map[yind + 1][xind] === 'X') {
+            if (this.map[yind + 1][xind] === 'X') {
+                eatsFood = true;
+            }
+            return {playerId: player.getClientId(), next: [newLocation[0], newLocation[1]], message: null, eatsFood: eatsFood};
+        }
+        else {
+            // ran into itself or another snake
+            return { playerId: player.getClientId(), next: [newLocation[0], newLocation[1]], message: JSON.stringify({'error': 'ran into snake', 'direction': direction }), eatsFood: eatsFood};
+        }
+
+    }
+
+    /**
      * updates board rep upon a move of a player
      * @param : move is a json containing moves of all existing players on board(we count no move as an empty move)
      */
-    updatePlayerLocation(moves: Array<{player: Player, direction: Direction}>): void {
-        // talk to joseph about this
-        // remove any indices from unoccupied
+    consolidatedMoves(moves: Array<{playerId: string, next: [number, number], message: string | null, eatsFood: boolean}>): 
+        Map<string, { next: [number, number], message: string | null, eatsFood: boolean }> {
+
+        const playersThatLost: Array<string> = [];
+        const consolidatedMovesMap: Map<string, {next: [number, number], message: string | null, eatsFood: boolean}> = new Map();
+        const newHeadLocations: Map<number, Array<string>> = new Map();
+
+        // change to map
+        const mappingPlayerToMoves: Map<string, {next: [number, number], message: string | null, eatsFood: boolean}> = new Map();
+        for (let move of moves) {
+            mappingPlayerToMoves.set(move.playerId, {next: move.next, message: move.message, eatsFood: move.eatsFood});
+        }
+
+        for (let move of moves) {
+            // 1. get rid of all players where playerNextLocation returns a failing JSON message because of crashing into a wall
+            if (typeof move.message === 'string') {
+                // check that we ran into wall
+                if (move.message['error'] === 'ran into wall') {
+                    playersThatLost.push(move.playerId);
+                }
+                // 3. assess all players that do return failing messages from playerNextLocation and override if the snake is running into a tail and the snake didn't eat food
+                else { // move.message['error'] === 'ran into snake'
+                    // check who the player is bumping into
+                    // check if that location is any player's tail and that the player didn't eat food
+                    const bumpedPlayerId: string = this.map[move.next[0]][move.next[1]];
+                    if (this.getPlayer(bumpedPlayerId).getTail() == move.next && !mappingPlayerToMoves[bumpedPlayerId].eatsFood) {
+                        const yind: number = move.next[1];
+                        const xind: number = move.next[0];
+
+                        let locationIndex: number = yind * this.cols + xind;
+                        if (newHeadLocations[locationIndex]) {
+                            newHeadLocations.get(locationIndex)?.push(move.playerId);
+                        }
+                        else {
+                            newHeadLocations.set(locationIndex, [move.playerId]);
+                        }
+                    }   
+                    else {
+                        playersThatLost.push(move.playerId); 
+                    }
+                }
+            }
+            else {
+                const yind: number = move.next[1];
+                const xind: number = move.next[0];
+            
+                let locationIndex: number = yind * this.cols + xind;
+                if (locationIndex) {
+                    newHeadLocations.get(locationIndex)?.push(move.playerId);
+                }
+                else {
+                    newHeadLocations.set(locationIndex, [move.playerId]);
+                }
+                
+            }
+        }
+
+        // 2. get rid of all players where playerNextLocation overlaps, i.e. two snake heads will clash
+        newHeadLocations.forEach((playerIds, index) => {
+            if (playerIds.length > 1) {
+                for (let playerId of playerIds) {
+                    if (!(playerId in playersThatLost)) {
+                        playersThatLost.push(playerId);
+                    }
+                }
+            }
+        });
+        
+
+        for (let move of moves) {
+            if (!(move.playerId in playersThatLost)) {
+                consolidatedMovesMap.set(move.playerId, {next: move.next, message: move.message, eatsFood: move.eatsFood});
+            }
+        }
+
+        return consolidatedMovesMap;
+
     }
 
 

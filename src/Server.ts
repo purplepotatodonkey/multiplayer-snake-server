@@ -24,7 +24,7 @@ class Server {
      * adds a playerId to the board, adds a new client using clientId
      */
     addClient(clientId: string) : void {
-        this.board.addPlayer();
+        this.board.addPlayer(clientId);
         this.clients.push(clientId);
     }
 
